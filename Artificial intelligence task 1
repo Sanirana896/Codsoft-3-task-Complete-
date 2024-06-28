@@ -1,0 +1,43 @@
+def chatbot response(user input):
+
+    # Convert input to lowercase for easier comparison
+    user input = user input.lower()
+
+    # Define some predefined rules and responses
+    responses =
+    {
+        "hi": "Hello! How can I help you today?",
+        "hello": "Hi there! What can I do for you?",
+        "how are you": "I'm just a bot, but thanks for asking!",
+        "what is your name": "I'm a chatbot. You can call me Chatbot.",
+        "default": "I'm sorry, I don't understand that. Can you ask me something else?"
+    }
+
+    # Check for specific user inputs and respond accordingly
+    if user input in responses:
+        return responses[user 1 input]
+    elif "how are you" in user input:
+        return responses["how are you"]
+    elif "your name" in user input or "who are you" in user input:
+        return responses["what is your name"]
+    else:
+        return responses["default"]
+
+# Example interaction with the chatbot
+Welcome! Type 'exit' to end the conversation.
+You: Hello
+Chatbot: Hi there! What can I do for you?
+You: What is your name?
+Chatbot: I'm a chatbot. You can call me Chatbot.
+You: How are you doing today?
+Chatbot: I'm just a bot, but thanks for asking!
+You: Goodbye
+Chatbot: Goodbye!
+print("Welcome! Type 'exit' to end the conversation.")
+while True:
+    user input = input("You: ")
+    if user input.lower() == 'exit':
+        print("Chatbot: Goodbye!")
+        break
+    response = chatbot response(user input)
+    print("Chatbot:", response)
