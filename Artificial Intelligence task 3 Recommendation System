@@ -34,3 +34,4 @@ def recommend_items(user_id, num_recommendations=5):
 user_id = 1
 recommended_items = recommend_items(user_id)
 print('Recommended items for user', user_id, ':', recommended_items)
+
