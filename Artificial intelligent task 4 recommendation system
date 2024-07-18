@@ -1,54 +1,66 @@
-import streamlit as st 
-import pandas as pd
-import pickle
-import requests
+# data
+data = {
+    'Movies': {
+        'The Mummy': ['Action', 'Adventure', 'Thriller'],
+        'Titanic': ['Comedy', 'Romance'],
+        'The Avatar': ['Action', 'Adventure', 'Fantasy'],
+        'Senior Year': ['Drama', 'Romance'],
+        'Home Alone': ['Comedy', 'Drama']
+    },
+    'Books': {
+        'Jack Reacher': ['Mystery', 'Thriller'],
+        'Her Keeper': ['Romance', 'Drama'],
+        'Harry Potter': ['Science Fiction', 'Adventure'],
+        'Around the Globe': ['Fantasy', 'Young Adult'],
+        'Emily': ['Non-Fiction', 'Self-Help']
+    },
+    'Items': {
+        'Vision Pro': ['Electronics', 'Gadgets'],
+        'Sombrero': ['Clothing', 'Fashion'],
+        'Birch table': ['Home Decor', 'Furniture'],
+        'Football': ['Sports', 'Outdoor'],
+        'RC Zoom': ['Toys', 'Kids']
+    }
+}
 
-def fetch_poster(movie_id):
-    url = "https://api.themoviedb.org/3/movie/{}?api_key=46e9fc286c8423153158c40cacf0017f&language=en-US".format(movie_id)
-    data = requests.get(url)
-    data = data.json()
-    poster_path = data['poster_path']
-    full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
-    return full_path
+# Function to recommend items based on user preferences
+def recommend_items(category, user_preferences):
+    recommended_items = []
 
-def recommend(movie):
-    index = movies[movies['original_title'] == movie].index[0]
-    distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
-    recommended_movie_names = []
-    recommended_movie_posters = []
-    for i in distances[1:6]:
-        # fetch the movie poster
-        movie_id = movies.iloc[i[0]].movie_id
-        recommended_movie_posters.append(fetch_poster(movie_id))
-        recommended_movie_names.append(movies.iloc[i[0]].original_title)
+    for item, attributes in data[category].items():
+        if all(attribute in attributes for attribute in user_preferences):
+            recommended_items.append(item)
 
-    return recommended_movie_names,recommended_movie_posters
+    return recommended_items
 
-movies_dict = pickle.load(open("movies.pkl", "rb"))
-similarity = pickle.load(open('similarity.pkl','rb'))
+# Function to take user preferences as input
+def get_user_preferences():
+    print("Enter your preferences (comma-separated) for the selected category:")
+    user_input = input().strip().split(',')
+    return [preference.strip() for preference in user_input]
 
-movies = pd.DataFrame(movies_dict)
+# Function to recommend items for a given category based on user preferences
+def recommend_category(category):
+    print(f"Recommendations for {category}:")
+    user_preferences = get_user_preferences()
+    recommended_items = recommend_items(category, user_preferences)
 
-st.header("Movie Recommendation System") 
+    if recommended_items:
+        print(f"Recommended {category} for preferences: {', '.join(user_preferences)}")
+        for item in recommended_items:
+            print(f"{category}: {item}")
+    else:
+        print(f"No {category} found for the given preferences.")
 
-option = st.selectbox("How would you like to be contacted?", movies['original_title'].values)
+# Ask the user to select a category (Movies, Books, or Items)
+while True:
+    print("Select a category: Movies, Books, Items (or 'exit' to quit)")
+    selected_category = input().strip().capitalize()
 
-if st.button('Show Recommendation'):
-    recommended_movie_names,recommended_movie_posters = recommend(option)
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
-        st.text(recommended_movie_names[0])
-        st.image(recommended_movie_posters[0])
-    with col2:
-        st.text(recommended_movie_names[1])
-        st.image(recommended_movie_posters[1])
+    if selected_category == 'Exit':
+        break
 
-    with col3:
-        st.text(recommended_movie_names[2])
-        st.image(recommended_movie_posters[2])
-    with col4:
-        st.text(recommended_movie_names[3])
-        st.image(recommended_movie_posters[3])
-    with col5:
-        st.text(recommended_movie_names[4])
-        st.image(recommended_movie_posters[4])
+    if selected_category in data:
+        recommend_category(selected_category)
+    else:
+        print("Invalid category. Please select Movies, Books, or Items.")
